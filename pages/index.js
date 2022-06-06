@@ -3,7 +3,7 @@ import Feed from '../components/Feed'
 import Sidebar from '../components/Sidebar'
 import Widgets from '../components/Widgets'
 
-export default function Home() {
+export default function Home({newResults}) {
   return (
     <>
      <Head>
@@ -12,7 +12,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className='flex min-h-screen max-w-7xl mx-auto'>
+      <main className='flex min-h-screen mx-auto'>
 
         {/* Sidebar */}
         <Sidebar/>
@@ -21,10 +21,19 @@ export default function Home() {
         <Feed/>
 
         {/* Widgets */}
-        <Widgets/>
+        <Widgets newResults={newResults.articles}/>
 
         {/* Modal */}
       </main>
     </>
   )
+}
+
+export async function getServerSideProps(){
+  const newResults = await fetch ("https://saurav.tech/NewsAPI/top-headlines/category/business/us.json").then((res) => res.json());
+  return {
+    props: {
+      newResults
+    }
+  }
 }
