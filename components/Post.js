@@ -5,8 +5,9 @@ import { collection, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firesto
 import { signIn, useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import Moment from 'react-moment'
-import { db } from '../firebase'
+import { db, storage } from '../firebase'
 import { HeartIcon as HearIconLiked } from '@heroicons/react/solid'
+import { deleteObject, ref } from 'firebase/storage'
 
 export default function Post({post}) {
     const {data: session} = useSession();
@@ -36,6 +37,14 @@ export default function Post({post}) {
             signIn()
         }
     }
+
+    async function deletePost(){
+       if(window.confirm("Are you sure want to delete this post?")){
+        deleteDoc(doc(db, "posts", post.id))
+        deleteObject(ref(storage, `posts/${post.id}/image`))
+       }
+    }
+
     return (
         <div className='flex p-3 cursor-pointer border-b border-gray-200'>
             {/* User Image */}
@@ -64,7 +73,9 @@ export default function Post({post}) {
                 {/* icons */}
                 <div className='flex justify-between text-gray-500 p-2 '>
                     <ChatIcon className='h-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
-                    <TrashIcon className='h-9 hoverEffect p-2 hover:text-rose-500 hover:bg-rose-100'/>
+                    {session?.user.uid === post?.data().id && (
+                        <TrashIcon onClick={deletePost} className='h-9 hoverEffect p-2 hover:text-rose-500 hover:bg-rose-100'/>
+                    )}
                     <div className='flex items-center'>
                         {hasLiked ? (
                             <HearIconLiked onClick={likedPost} className='h-9 hoverEffect p-2 text-rose-500 hover:bg-rose-100'/>
