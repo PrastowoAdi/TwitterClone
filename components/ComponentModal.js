@@ -32,7 +32,8 @@ export default function ComponentModal() {
             name: session.user.name,
             username: session.user.username,
             userImg: session.user.image,
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            userId: session.user.uid
         })
 
         setOpen(false)
@@ -73,13 +74,13 @@ export default function ComponentModal() {
                         </div>
                         <div className="flex items-center justify-between pt-2.5">
                             
-                                    <div className="flex">
-                                        <div className="" onClick={() => filePickerRef.current.click()}>
-                                        <PhotographIcon className="hoverEffect p-2 text-sky-400 hover:bg-sky-100 h-10 w-10"/>
-                                        </div>
-                                        <EmojiHappyIcon className="hoverEffect p-2 text-sky-400 hover:bg-sky-100 h-10 w-10"/>
-                                    </div>
-                                    <button onClick={sendComment} disabled={!input.trim()}  className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50" type="submit">Reply</button>
+                            <div className="flex">
+                                <div className="" onClick={() => filePickerRef.current.click()}>
+                                <PhotographIcon className="hoverEffect p-2 text-sky-400 hover:bg-sky-100 h-10 w-10"/>
+                                </div>
+                                <EmojiHappyIcon className="hoverEffect p-2 text-sky-400 hover:bg-sky-100 h-10 w-10"/>
+                            </div>
+                            <button onClick={sendComment} disabled={!input.trim()}  className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50" type="submit">Reply</button>
                                 
                         </div>
                         

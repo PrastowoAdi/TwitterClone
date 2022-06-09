@@ -68,7 +68,7 @@ export default function Post({post,id}) {
             <img
                 className="h-11 w-11 rounded-full mr-4"
                 src={post?.data()?.userImg}
-                alt="user-img"
+                alt=""
             />
             {/* right side */}
             <div className='flex-1'>
@@ -88,9 +88,9 @@ export default function Post({post,id}) {
                     <DotsHorizontalIcon className='h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2'/>
                 </div>
                 {/* post text */}
-                <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post?.data()?.text}</p>
+                <p onClick={() => router.push(`/posts/${id}`)} className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post?.data()?.text}</p>
                 {/* post image */}
-                <img src={post?.data()?.image} alt='post-img' className='rounded-2xl mr-2'/>
+                <img onClick={() => router.push(`/posts/${id}`)} src={post?.data()?.image} alt='' className='rounded-2xl mr-2'/>
                 {/* icons */}
                 <div className='flex justify-between text-gray-500 p-2 '>
                     <div className='flex items-center select-none'>
