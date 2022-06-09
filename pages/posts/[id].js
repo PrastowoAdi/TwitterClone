@@ -10,6 +10,7 @@ import Posts from '../../components/Post'
 import { useEffect,useState } from 'react'
 import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function PostPage({newResults, randomUsersResults}) {
     const router = useRouter();
@@ -54,18 +55,29 @@ export default function PostPage({newResults, randomUsersResults}) {
                     <h2 className='text-lg sm:text-xl font-bold cursor-pointer'>Tweet</h2>
                 </div>
                 <Posts id={id} post={post}/>
+                <AnimatePresence>
                 {comments.length > 0 && (
-                    <div>
+                    <div className=''>
                         {comments.map((comment) => (
-                            <Comment
+                          <motion.div
+                          key={post.id}
+                          initial={{opacity: 0}}
+                          animate={{opacity: 1}}
+                          exit={{opacity: 0}}
+                          trasition={{duration: 1}}
+                      >
+                           <Comment
                             key={comment.id}
                             commentId={comment.id}
                             originalPostId={id}
                             comment={comment.data()}
                             />
+                      </motion.div>
+                           
                         ))}
                     </div>
                 )}
+                </AnimatePresence>
             </div>
 
             {/* Widgets */}
