@@ -37,7 +37,7 @@ export default function ComponentModal() {
 
         setOpen(false)
         setInput("")
-        router.push(`/pots/${postId}`)
+        router.push(`/posts/${postId}`)
     }
   return (
     <div>

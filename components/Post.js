@@ -3,6 +3,7 @@
 import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, HeartIcon, ShareIcon, TrashIcon } from '@heroicons/react/outline'
 import { collection, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore'
 import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import { db, storage } from '../firebase'
@@ -11,23 +12,24 @@ import { deleteObject, ref } from 'firebase/storage'
 import { useRecoilState } from 'recoil'
 import { modalState, postIdState } from '../atom/modalAtom'
 
-export default function Post({post}) {
+export default function Post({post,id}) {
     const {data: session} = useSession();
     const [likes, setLikes] = useState([]);
     const [comments, setComment] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
     const [open, setOpen] = useRecoilState(modalState)
     const [postId, setPostId] = useRecoilState(postIdState)
+    const router = useRouter()
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
-            collection(db, 'posts', post.id, 'likes'),(snapshot) => setLikes(snapshot.docs)
+            collection(db, 'posts', id, 'likes'),(snapshot) => setLikes(snapshot.docs)
         )
     },[db])
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
-            collection(db, 'posts', post.id, 'comments'),(snapshot) => setComment(snapshot.docs)
+            collection(db, 'posts', id, 'comments'),(snapshot) => setComment(snapshot.docs)
         )
     },[db])
 
@@ -38,9 +40,9 @@ export default function Post({post}) {
     async function likedPost (){
         if(session){
             if(hasLiked){
-                await deleteDoc(doc(db, "posts", post.id, "likes", session?.user.uid))
+                await deleteDoc(doc(db, "posts", id, "likes", session?.user.uid))
             } else {
-                await setDoc(doc(db, "posts", post.id, "likes", session.user.uid), {
+                await setDoc(doc(db, "posts", id, "likes", session.user.uid), {
                     username: session?.user.username
                 })
             }
@@ -51,15 +53,23 @@ export default function Post({post}) {
 
     async function deletePost(){
        if(window.confirm("Are you sure want to delete this post?")){
-        deleteDoc(doc(db, "posts", post.id))
-        deleteObject(ref(storage, `posts/${post.id}/image`))
+        deleteDoc(doc(db, "posts", id));
+        if(post.data().image){
+            deleteObject(ref(storage, `posts/${id}/image`))
+        }
+        router.push("/")
        }
+
     }
 
     return (
         <div className='flex p-3 cursor-pointer border-b border-gray-200'>
             {/* User Image */}
-            <img className='h-11 w-11 rounded-full mr-4' src={post.data().userImg} alt='user-img'/>
+            <img
+                className="h-11 w-11 rounded-full mr-4"
+                src={post?.data()?.userImg}
+                alt="user-img"
+            />
             {/* right side */}
             <div className='flex-1'>
                 {/* Header */}
@@ -67,8 +77,8 @@ export default function Post({post}) {
                 <div className='flex items-center justify-between'>
                     {/* post user info */}
                     <div className='flex items-center space-x-1 whitespace-nowrap'>
-                        <h4 className='font-bold text-[15px] sm:text-[16px] hover:underline'>{post.data().name}</h4>
-                        <span className='text-sm sm:text-[15px]'>@{post.data().username} - </span>
+                        <h4 className='font-bold text-[15px] sm:text-[16px] hover:underline'>{post?.data()?.name}</h4>
+                        <span className='text-sm sm:text-[15px]'>@{post?.data()?.username} - </span>
                         <span className='text-sm sm:text-[15px] hover:underline'>
                             <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
                         </span>
@@ -78,9 +88,9 @@ export default function Post({post}) {
                     <DotsHorizontalIcon className='h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2'/>
                 </div>
                 {/* post text */}
-                <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post.data().text}</p>
+                <p className='text-gray-800 text-[15px] sm:text-[16px] mb-2'>{post?.data()?.text}</p>
                 {/* post image */}
-                <img src={post.data().image} alt='post-img' className='rounded-2xl mr-2'/>
+                <img src={post?.data()?.image} alt='post-img' className='rounded-2xl mr-2'/>
                 {/* icons */}
                 <div className='flex justify-between text-gray-500 p-2 '>
                     <div className='flex items-center select-none'>
@@ -89,14 +99,14 @@ export default function Post({post}) {
                             signIn()
                         } else {
                             setOpen(!open);
-                            setPostId(post.id);
+                            setPostId(id);
                         }
                     }} className='h-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100'/>
                     {comments.length > 0 && (
                         <span className='text-sm'>{comments.length}</span>
                     )}
                     </div> 
-                    {session?.user.uid === post?.data().id && (
+                    {session?.user.uid === post?.data()?.id && (
                         <TrashIcon onClick={deletePost} className='h-9 hoverEffect p-2 hover:text-rose-500 hover:bg-rose-100'/>
                     )}
                     <div className='flex items-center'>
