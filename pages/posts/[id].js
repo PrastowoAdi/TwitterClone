@@ -4,20 +4,33 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import ComponentModal from '../../components/ComponentModal'
 import Sidebar from '../../components/Sidebar'
+import Comment from '../../components/Comment'
 import Widgets from '../../components/Widgets'
 import Posts from '../../components/Post'
 import { useEffect,useState } from 'react'
-import { doc, onSnapshot } from 'firebase/firestore'
+import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../../firebase'
 
 export default function PostPage({newResults, randomUsersResults}) {
     const router = useRouter();
     const {id} = router.query;
-    const [post, setPost] = useState()
+    const [post, setPost] = useState();
+    const [comments, setComments] = useState([])
 
     useEffect(() => {
         onSnapshot(doc(db, "posts", id),(snapshot) => setPost(snapshot))
     },[db,id])
+
+    useEffect(() => {
+        onSnapshot(
+          query(
+            collection(db, "posts", id, "comments"),
+            orderBy("timestamp", "desc")
+          ),
+          (snapshot) => setComments(snapshot.docs)
+        );
+      }, [db, id]);
+      console.log(comments);
 
     return (
         <>
@@ -41,6 +54,17 @@ export default function PostPage({newResults, randomUsersResults}) {
                     <h2 className='text-lg sm:text-xl font-bold cursor-pointer'>Tweet</h2>
                 </div>
                 <Posts id={id} post={post}/>
+                {comments.length > 0 && (
+                    <div>
+                        {comments.map((comment) => (
+                            <Comment
+                            key={comment.id}
+                            id={comment.id}
+                            comment={comment.data()}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Widgets */}
