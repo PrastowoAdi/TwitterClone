@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable react/jsx-key */
 import { SparklesIcon } from '@heroicons/react/outline'
 import React from 'react'
@@ -6,6 +7,7 @@ import Post from './Post'
 import { useState,useEffect } from 'react'
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../firebase'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Feed() {
     const [posts, setPosts] = useState([])
@@ -26,12 +28,22 @@ export default function Feed() {
             </div>
 
             <Input/>
+            <AnimatePresence>
             {posts.map((post) => (
-                <Post
-                    key={post.id} 
-                    post={post}
-                />
+                <motion.div
+                    key={post.id}
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                    exit={{opacity: 0}}
+                    trasition={{duration: 1}}
+                >
+                    <Post
+                        key={post.id} 
+                        post={post}
+                    />
+                </motion.div>
             ))}
+            </AnimatePresence>
         </div>
     )
 }
